@@ -1,0 +1,14 @@
+#!/usr/bin/env php
+<?php
+
+use Illuminate\Contracts\Console\Kernel;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+
+$app = require __DIR__ . '/app/app.php';
+
+$kernel = $app->make(
+    Kernel::class
+);
+
+exit($kernel->handle(new ArgvInput, new ConsoleOutput));
