@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Http\Response;
 
 use App\Models\AbstractModel;
+use App\Tracking\TrackingManager;
 use Illuminate\Http\JsonResponse;
 
 class Response extends \Illuminate\Http\Response
@@ -18,6 +19,9 @@ class Response extends \Illuminate\Http\Response
 
     /** @var string|null  */
     private ?string $errorMessage = null;
+
+    /** @var string|null  */
+    private ?string $trackingId = null;
 
     /**
      * @return mixed
@@ -41,6 +45,14 @@ class Response extends \Illuminate\Http\Response
     public function getErrorMessage(): ?string
     {
         return $this->errorMessage;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getTrackingId(): ?string
+    {
+        return $this->trackingId;
     }
 
     /**
@@ -76,6 +88,17 @@ class Response extends \Illuminate\Http\Response
         return $this;
     }
 
+    /**
+     * @param string|null $trackingId
+     * @return self
+     */
+    public function setTrackingId(?string $trackingId): self
+    {
+        $this->trackingId = $trackingId;
+
+        return $this;
+    }
+
     private function recursiveExport($data): array
     {
         if ($data instanceof AbstractModel) {
@@ -101,6 +124,11 @@ class Response extends \Illuminate\Http\Response
 
     public function build(): JsonResponse
     {
+        if ($this->trackingId !== null) {
+            $trackingManager = new TrackingManager();
+            $trackingManager->update($this->trackingId, $this);
+        }
+
         $output = [
             "success" => $this->statusCode === 200,
             "method" => \request()->route()[1]['as'],
@@ -122,10 +150,10 @@ class Response extends \Illuminate\Http\Response
 
         $this->result = $this->recursiveExport($this->result);
 
-        if ($this->result !== null) {
+        if ($this->result !== null && !empty($this->result)) {
             $output["result"] = $this->result;
         }
 
-        return response()->json($output);
+        return response()->json($output, $this->statusCode);
     }
 }

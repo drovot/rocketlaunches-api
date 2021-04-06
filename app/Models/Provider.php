@@ -11,6 +11,14 @@ use App\Models\Utils\HasId;
 class Provider extends AbstractModel
 {
 
+    public const KEY_ID = 'id';
+    public const KEY_NAME = 'name';
+    public const KEY_SLUG = 'slug';
+    public const KEY_ABBREVIATION = 'abbreviation';
+    public const KEY_WIKI_URL = 'wiki_url';
+    public const KEY_IMAGE_URL = 'image_url';
+    public const KEY_LOGO_URL = 'logo_url';
+
     use HasId;
     use HasNameSlug;
 
@@ -32,13 +40,13 @@ class Provider extends AbstractModel
     public function export(): array
     {
         return [
-            "id" => $this->id,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "abbreviation" => $this->abbreviation,
-            "wikiURL" => $this->wikiURL,
-            "imageURL" => $this->imageURL,
-            "logoURL" => $this->logoURL,
+            self::KEY_ID => $this->id,
+            self::KEY_NAME => $this->name,
+            self::KEY_SLUG => $this->slug,
+            self::KEY_ABBREVIATION => $this->abbreviation,
+            self::KEY_WIKI_URL => $this->wikiURL,
+            self::KEY_IMAGE_URL => $this->imageURL,
+            self::KEY_LOGO_URL => $this->logoURL,
         ];
     }
 

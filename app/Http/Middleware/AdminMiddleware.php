@@ -6,7 +6,7 @@ use App\Http\Response\Response;
 use Closure;
 use Illuminate\Http\Request;
 
-class Admin
+class AdminMiddleware
 {
 
     /**
@@ -18,8 +18,14 @@ class Admin
      */
     public function handle(Request $request, Closure $next)
     {
+
         if (!$request->hasHeader("Authorization") || !$this->checkAdminPassword($request->header("Authorization"))) {
             $response = new Response();
+
+            if ($request->attributes->has('tracking_id')) {
+                $response->setTrackingId($request->attributes->get('tracking_id'));
+            }
+
             return $response->setStatusCode(401)->build();
         }
 

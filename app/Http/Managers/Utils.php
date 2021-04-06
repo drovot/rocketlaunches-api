@@ -24,4 +24,20 @@ class Utils
 
         return $text;
     }
+
+    /**
+     * @param int $length
+     * @return string
+     */
+    public static function generateString(int $length = 16): string
+    {
+        $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $string = '';
+
+        for ($i = 0; $i < $length; $i++) {
+            try { $string .= $characters[random_int(0, strlen($characters))]; } catch(\Exception $exception) {}
+        }
+
+        return $string;
+    }
 }

@@ -11,6 +11,9 @@ class ProviderManager
 {
 
     public const TABLE = "rl_provider";
+    public const SELECT = [
+        "id", "name", "slug", "abbreviation", "wiki_url", "image_url", "logo_url"
+    ];
 
     /**
      * @param int|string $id
@@ -19,9 +22,7 @@ class ProviderManager
     public function getProviderById($id): ?Provider
     {
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "abbreviation", "wikiURL", "imageURL", "logoURL"
-            ])
+            ->select(self::SELECT)
             ->where("id", "=", $id)
             ->first();
 
@@ -39,9 +40,7 @@ class ProviderManager
     public function getProviderBySlug(string $slug): ?Provider
     {
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "abbreviation", "wikiURL", "imageURL", "logoURL"
-            ])
+            ->select(self::SELECT)
             ->where("slug", "=", $slug)
             ->first();
 
@@ -63,9 +62,7 @@ class ProviderManager
     {
         $providers = [];
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "abbreviation", "wikiURL", "imageURL", "logoURL"
-            ])
+            ->select(self::SELECT)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->orderBy($orderBy, $orderMethod)
@@ -111,16 +108,16 @@ class ProviderManager
             $provider->setAbbreviation($result->abbreviation);
         }
 
-        if (isset($result->wikiURL)) {
-            $provider->setWikiURL($result->wikiURL);
+        if (isset($result->wiki_url)) {
+            $provider->setWikiURL($result->wiki_url);
         }
 
-        if (isset($result->imageURL)) {
-            $provider->setImageURL($result->imageURL);
+        if (isset($result->image_url)) {
+            $provider->setImageURL($result->image_url);
         }
 
-        if (isset($result->logoURL)) {
-            $provider->setLogoURL($result->logoURL);
+        if (isset($result->logo_url)) {
+            $provider->setLogoURL($result->logo_url);
         }
 
         return $provider;
@@ -143,9 +140,9 @@ class ProviderManager
             "name" => $name,
             "slug" => Utils::stringToSlug($name),
             "abbreviation" => $abbreviation,
-            "wikiURL" => $wikiURL,
-            "imageURL" => $imageURL,
-            "logoURL" => $logoURL,
+            "wiki_url" => $wikiURL,
+            "image_url" => $imageURL,
+            "logo_url" => $logoURL,
         ]);
     }
 
@@ -220,15 +217,15 @@ class ProviderManager
         }
 
         if ($wikiURL !== null) {
-            $array['wikiURL'] = $wikiURL;
+            $array['wiki_url'] = $wikiURL;
         }
 
         if ($imageURL !== null) {
-            $array['imageURL'] = $imageURL;
+            $array['image_url'] = $imageURL;
         }
 
         if ($logoURL !== null) {
-            $array['logoURL'] = $logoURL;
+            $array['logo_url'] = $logoURL;
         }
 
         return $array;

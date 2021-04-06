@@ -11,6 +11,9 @@ class PadManager
 {
 
     public const TABLE = "rl_pad";
+    public const SELECT = [
+        "id", "name", "slug", "wiki_url", "image_url"
+    ];
 
     /**
      * @param int|string $id
@@ -19,9 +22,7 @@ class PadManager
     public function getPadById($id): ?Pad
     {
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "wikiURL", "imageURL"
-            ])
+            ->select(self::SELECT)
             ->where("id", "=", $id)
             ->first();
 
@@ -39,9 +40,7 @@ class PadManager
     public function getPadBySlug(string $slug): ?Pad
     {
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "wikiURL", "imageURL"
-            ])
+            ->select(self::SELECT)
             ->where("slug", "=", $slug)
             ->first();
 
@@ -64,9 +63,7 @@ class PadManager
     {
         $providers = [];
         $result = DB::table(self::TABLE)
-            ->select([
-                "id", "name", "slug", "wikiURL", "imageURL"
-            ])
+            ->select(self::SELECT)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->orderBy($orderBy, $orderMethod)
@@ -100,12 +97,12 @@ class PadManager
             $pad->setSlug($result->slug);
         }
 
-        if (isset($result->wikiURL)) {
-            $pad->setWikiURL($result->wikiURL);
+        if (isset($result->wiki_url)) {
+            $pad->setWikiURL($result->wiki_url);
         }
 
-        if (isset($result->imageURL)) {
-            $pad->setImageURL($result->imageURL);
+        if (isset($result->image_url)) {
+            $pad->setImageURL($result->image_url);
         }
 
         return $pad;
@@ -125,8 +122,8 @@ class PadManager
         return DB::table(self::TABLE)->insert([
             "name" => $name,
             "slug" => Utils::stringToSlug($name),
-            "wikiURL" => $wikiURL,
-            "imageURL" => $imageURL,
+            "wiki_url" => $wikiURL,
+            "image_url" => $imageURL,
         ]);
     }
 
@@ -187,11 +184,11 @@ class PadManager
         }
 
         if ($wikiURL !== null) {
-            $array['wikiURL'] = $wikiURL;
+            $array['wiki_url'] = $wikiURL;
         }
 
         if ($imageURL !== null) {
-            $array['imageURL'] = $imageURL;
+            $array['image_url'] = $imageURL;
         }
 
         return $array;

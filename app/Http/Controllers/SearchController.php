@@ -25,6 +25,9 @@ class SearchController
         $search = $this->searchManager->advancedSearch($query);
         $response = new Response();
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         if ($search === null) {
             return $response->setStatusCode(204)->build();
         }

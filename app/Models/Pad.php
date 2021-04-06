@@ -11,6 +11,12 @@ use App\Models\Utils\HasId;
 class Pad extends AbstractModel
 {
 
+    public const KEY_ID = 'id';
+    public const KEY_NAME = 'name';
+    public const KEY_SLUG = 'slug';
+    public const KEY_WIKI_URL = 'wiki_url';
+    public const KEY_IMAGE_URL = 'image_url';
+
     use HasId;
     use HasNameSlug;
 
@@ -26,11 +32,11 @@ class Pad extends AbstractModel
     public function export(): array
     {
         return [
-            "id" => $this->id,
-            "name" => $this->name,
-            "slug" => $this->slug,
-            "wikiURL" => $this->wikiURL,
-            "imageURL" => $this->imageURL,
+            self::KEY_ID => $this->id,
+            self::KEY_NAME => $this->name,
+            self::KEY_SLUG => $this->slug,
+            self::KEY_WIKI_URL => $this->wikiURL,
+            self::KEY_IMAGE_URL => $this->imageURL,
         ];
     }
 

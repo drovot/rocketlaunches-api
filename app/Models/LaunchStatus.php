@@ -9,6 +9,10 @@ use App\Models\Utils\HasId;
 class LaunchStatus extends AbstractModel
 {
 
+    public const KEY_ID = 'id';
+    public const KEY_DISPLAY_NAME = 'name';
+    public const KEY_CANCELLED = 'slug';
+
     use HasId;
 
     /** @var string|null  */
@@ -23,9 +27,9 @@ class LaunchStatus extends AbstractModel
     public function export(): array
     {
         return [
-            "id" => $this->id,
-            "displayName" => $this->displayName,
-            "cancelled" => $this->cancelled
+            self::KEY_ID => $this->id,
+            self::KEY_DISPLAY_NAME => $this->displayName,
+            self::KEY_CANCELLED => $this->cancelled
         ];
     }
 

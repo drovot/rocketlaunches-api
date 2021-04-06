@@ -12,35 +12,26 @@ use App\Http\Managers\RocketManager;
 use App\Http\Managers\StatusManager;
 use App\Http\Managers\Utils;
 use App\Http\Response\Response;
+use App\Tracking\TrackingManager;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class LaunchController extends Controller
 {
 
-    /**
-     * @var LaunchManager
-     */
+    /** @var LaunchManager  */
     private LaunchManager $launchManager;
 
-    /**
-     * @var RocketManager
-     */
+    /** @var RocketManager  */
     private RocketManager $rocketManager;
 
-    /**
-     * @var ProviderManager
-     */
+    /** @var ProviderManager  */
     private ProviderManager $providerManager;
 
-    /**
-     * @var PadManager
-     */
+    /** @var PadManager  */
     private PadManager $padManager;
 
-    /**
-     * @var StatusManager
-     */
+    /** @var StatusManager  */
     private StatusManager $statusManager;
 
     /**
@@ -68,9 +59,12 @@ class LaunchController extends Controller
 
         $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         $result = $this->launchManager->getLaunchBySlug($launch, $detailed);
 
-        if ($result === null || !$result->isPublished()) {
+        if ($result === null) {
             return $response->setStatusCode(404)->build();
         }
 
@@ -92,6 +86,9 @@ class LaunchController extends Controller
         $provider = $request->has("provider") ? $this->providerManager->getProviderBySlug($request->get("provider")) : null;
         $pad = $request->has("pad") ? $this->padManager->getPadBySlug($request->get("pad")) : null;
         $launchStatus = $request->has("status") ? $this->statusManager->getStatusByDisplayName($request->get("status")) : null;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $success = $this->launchManager->createLaunch(
             $name,
@@ -124,25 +121,30 @@ class LaunchController extends Controller
         $response = new Response();
 
         $name = $request->has("name") ? $request->get("name") : null;
+        $slug = $request->has("slug") ? $request->get("slug") : $launch;
         $description = $request->has("description") ? $request->get("description") : null;
         $rocket = $request->has("rocket") ? $this->rocketManager->getRocketBySlug($request->get("rocket")) : null;
         $provider = $request->has("provider") ? $this->providerManager->getProviderBySlug($request->get("provider")) : null;
         $pad = $request->has("pad") ? $this->padManager->getPadBySlug($request->get("pad")) : null;
-        $livestream = $request->has("livestream") ? $request->get("livestream") : null;
+        $livestream = $request->has("livestream_url") ? $request->get("livestream_url") : null;
         $launchStatus = $request->has("status") ? $this->statusManager->getStatusByDisplayName($request->get("status")) : null;
         $published = $request->has("published") ? (bool) $request->get("published") : null;
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         $success = $this->launchManager->updateLaunch(
             $launch,
+            $slug,
             $name,
             $description,
             $rocket,
             $pad,
             $provider,
             $launchStatus,
-            $livestream,
-            [],
             null,
+            [],
+            $livestream,
             $published
         );
 
@@ -150,17 +152,21 @@ class LaunchController extends Controller
             return $response->setStatusCode(404)->build();
         }
 
-        $result = $this->launchManager->getLaunchBySlug($launch, true);
+        $result = $this->launchManager->getLaunchBySlug($slug, true);
         return $response->setResult($result)->build();
     }
 
     /**
      * @param string $launch
+     * @param Request $request
      * @return JsonResponse
      */
-    public function deleteLaunch(string $launch): JsonResponse
+    public function deleteLaunch(string $launch, Request $request): JsonResponse
     {
         $response = new Response();
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $result = $this->launchManager->getLaunchBySlug($launch);
 
@@ -184,6 +190,9 @@ class LaunchController extends Controller
         $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
         $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
         $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $launches = $this->launchManager->getLaunchesAdmin(
             $limit,
@@ -210,6 +219,9 @@ class LaunchController extends Controller
         $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
         $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
         $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;
@@ -240,9 +252,12 @@ class LaunchController extends Controller
         $response = new Response();
 
         // parameters
-        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
-        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
-        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+        $limit = $request->has('limit') ? (int) $request->get('limit') : Defaults::REQUEST_LIMIT;
+        $page = $request->has('page') ? (int) $request->get('page') : Defaults::REQUEST_PAGE;
+        $detailed = $request->has('detailed') ? (bool) $request->get('detailed') : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;
@@ -277,6 +292,9 @@ class LaunchController extends Controller
         $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
         $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;
         }
@@ -303,17 +321,20 @@ class LaunchController extends Controller
     {
         $response = new Response();
 
+        // parameters
+        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
+        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
+        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         // provider
         $provider = $this->providerManager->getProviderBySlug($provider);
 
         if ($provider === null) {
             return $response->setStatusCode(404)->setErrorMessage("This Provider could not be found")->build();
         }
-
-        // parameters
-        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
-        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
-        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
 
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;
@@ -342,17 +363,20 @@ class LaunchController extends Controller
     {
         $response = new Response();
 
+        // parameters
+        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
+        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
+        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         // rocket
         $rocket = $this->rocketManager->getRocketBySlug($rocket);
 
         if ($rocket === null) {
             return $response->setStatusCode(404)->setErrorMessage("This Rocket could not be found")->build();
         }
-
-        // parameters
-        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
-        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
-        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
 
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;
@@ -381,17 +405,20 @@ class LaunchController extends Controller
     {
         $response = new Response();
 
+        // parameters
+        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
+        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
+        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         // pad
         $pad = $this->padManager->getPadBySlug($pad);
 
         if ($pad === null) {
             return $response->setStatusCode(404)->setErrorMessage("This Pad could not be found")->build();
         }
-
-        // parameters
-        $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
-        $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
-        $detailed = $request->has("detailed") ? (bool) $request->get("detailed") : Defaults::REQUEST_DETAILED;
 
         if (!is_bool($detailed)) {
             $detailed = Defaults::REQUEST_DETAILED;

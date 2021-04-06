@@ -11,6 +11,25 @@ use App\Models\Utils\HasId;
 class Launch extends AbstractModel
 {
 
+    public const KEY_ID = 'id';
+    public const KEY_NAME = 'name';
+    public const KEY_SLUG = 'slug';
+    public const KEY_DESCRIPTION = 'description';
+    public const KEY_STATUS = 'status';
+    public const KEY_ROCKET = 'rocket';
+    public const KEY_PROVIDER = 'provider';
+    public const KEY_PAD = 'pad';
+    public const KEY_TAGS = 'tags';
+    public const KEY_LIVESTREAM_URL = 'livestream_url';
+    public const KEY_LAUNCH_TIME = 'launch_time';
+    public const KEY_PUBLISHED = 'published';
+    public const KEY_DETAILED = 'detailed';
+
+    public const KEY_STATUS_ID = 'status_id';
+    public const KEY_ROCKET_ID = 'rocket_id';
+    public const KEY_PROVIDER_ID = 'provider_id';
+    public const KEY_PAD_ID = 'pad_id';
+
     use HasId;
     use HasNameSlug;
 
@@ -49,27 +68,54 @@ class Launch extends AbstractModel
      */
     public function export(): array
     {
+        if (!$this->isPublished()) {
+            return $this->isDetailed() ?
+                [
+                    self::KEY_ID => $this->id,
+                    self::KEY_NAME => $this->name,
+                    self::KEY_SLUG => $this->slug,
+                    self::KEY_DESCRIPTION => $this->description ?? null,
+                    self::KEY_STATUS => $this->status !== null ? $this->status->export() : null,
+                    self::KEY_ROCKET => $this->rocket !== null ? $this->rocket->export() : null,
+                    self::KEY_PROVIDER => $this->provider !== null ? $this->provider->export() : null,
+                    self::KEY_PAD => $this->pad !== null ? $this->pad->export() : null,
+                    self::KEY_TAGS => $this->tags,
+                    self::KEY_LIVESTREAM_URL => $this->livestreamURL ?? null,
+                    self::KEY_LAUNCH_TIME => $this->launchTime !== null ? $this->launchTime->export() : null,
+                    self::KEY_PUBLISHED => $this->published
+                ]
+                :
+                [
+                    self::KEY_ID => $this->id,
+                    self::KEY_NAME => $this->name,
+                    self::KEY_SLUG => $this->slug,
+                    self::KEY_DESCRIPTION => $this->description ?? null,
+                    self::KEY_TAGS => $this->tags,
+                    self::KEY_PUBLISHED => $this->published
+                ];
+        }
+
         return $this->isDetailed() ?
             [
-                "id" => $this->id,
-                "name" => $this->name,
-                "slug" => $this->slug,
-                "description" => $this->description ?? null,
-                "status" => $this->status !== null ? $this->status->export() : null,
-                "rocket" => $this->rocket !== null ? $this->rocket->export() : null,
-                "provider" => $this->provider !== null ? $this->provider->export() : null,
-                "pad" => $this->pad !== null ? $this->pad->export() : null,
-                "tags" => $this->tags,
-                "livestreamURL" => $this->livestreamURL ?? null,
-                "launchTime" => $this->launchTime !== null ? $this->launchTime->export() : null
+                self::KEY_ID => $this->id,
+                self::KEY_NAME => $this->name,
+                self::KEY_SLUG => $this->slug,
+                self::KEY_DESCRIPTION => $this->description ?? null,
+                self::KEY_STATUS => $this->status !== null ? $this->status->export() : null,
+                self::KEY_ROCKET => $this->rocket !== null ? $this->rocket->export() : null,
+                self::KEY_PROVIDER => $this->provider !== null ? $this->provider->export() : null,
+                self::KEY_PAD => $this->pad !== null ? $this->pad->export() : null,
+                self::KEY_TAGS => $this->tags,
+                self::KEY_LIVESTREAM_URL => $this->livestreamURL ?? null,
+                self::KEY_LAUNCH_TIME => $this->launchTime !== null ? $this->launchTime->export() : null
             ]
             :
             [
-                "id" => $this->id,
-                "name" => $this->name,
-                "slug" => $this->slug,
-                "description" => $this->description ?? null,
-                "tags" => $this->tags,
+                self::KEY_ID => $this->id,
+                self::KEY_NAME => $this->name,
+                self::KEY_SLUG => $this->slug,
+                self::KEY_DESCRIPTION => $this->description ?? null,
+                self::KEY_TAGS => $this->tags
             ];
     }
 
