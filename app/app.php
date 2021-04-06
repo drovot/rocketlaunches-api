@@ -1,5 +1,7 @@
 <?php
 
+use App\Providers\AppServiceProvider;
+
 require_once __DIR__ . '/../vendor/autoload.php';
 
 (new Laravel\Lumen\Bootstrap\LoadEnvironmentVariables(
@@ -10,6 +12,8 @@ date_default_timezone_set(env('APP_TIMEZONE', 'UTC'));
 
 $app = new Laravel\Lumen\Application(dirname(__DIR__));
 $app->withFacades();
+
+$app->register(AppServiceProvider::class);
 
 $app->singleton(
     Illuminate\Contracts\Debug\ExceptionHandler::class,
@@ -28,8 +32,8 @@ $app->middleware([
 ]);
 
 $app->routeMiddleware([
-    'admin' => App\Http\Middleware\Admin::class,
-    'auth' => App\Http\Middleware\Authenticate::class,
+    'admin' => App\Http\Middleware\AdminMiddleware::class,
+    'tracking' => App\Http\Middleware\TrackingMiddleware::class,
 ]);
 
 $app->router->group([

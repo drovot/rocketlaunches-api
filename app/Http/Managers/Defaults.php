@@ -15,7 +15,7 @@ class Defaults
     public const DATABASE_ORDER_ASC = "asc";
     public const DATABASE_ORDER_DESC = "desc";
 
-    public const DATABASE_COLUMN_START_NET = "startNet";
+    public const DATABASE_COLUMN_START_NET = "start_net";
     public const DATABASE_COLUMN_CREATED = "created_at";
 
     public const STATUS_PUBLISHED = false;

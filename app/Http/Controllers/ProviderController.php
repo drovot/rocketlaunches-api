@@ -31,11 +31,15 @@ class ProviderController extends Controller
 
     /**
      * @param string $provider
+     * @param Request $request
      * @return JsonResponse
      */
-    public function getProvider(string $provider): JsonResponse
+    public function getProvider(string $provider, Request $request): JsonResponse
     {
         $response = new Response();
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $result = $this->providerManager->getProviderBySlug($provider);
 
@@ -57,6 +61,9 @@ class ProviderController extends Controller
         // parameters
         $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
         $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $providers = $this->providerManager->getProviders(
             Defaults::DATABASE_COLUMN_CREATED,
@@ -85,6 +92,9 @@ class ProviderController extends Controller
         $wikiURL = $request->has("wikiURL") ? $request->get("wikiURL") : null;
         $imageURL = $request->has("imageURL") ? $request->get("imageURL") : null;
         $logoURL = $request->has("logoURL") ? $request->get("logoURL") : null;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $success = $this->providerManager->createProvider(
             $name,
@@ -118,6 +128,9 @@ class ProviderController extends Controller
         $imageURL = $request->has("imageURL") ? $request->get("imageURL") : null;
         $logoURL = $request->has("logoURL") ? $request->get("logoURL") : null;
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         $success = $this->providerManager->updateProvider(
             $provider,
             $name,
@@ -137,11 +150,15 @@ class ProviderController extends Controller
 
     /**
      * @param string $provider
+     * @param Request $request
      * @return JsonResponse
      */
-    public function deleteProvider(string $provider): JsonResponse
+    public function deleteProvider(string $provider, Request $request): JsonResponse
     {
         $response = new Response();
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $result = $this->providerManager->getProviderBySlug($provider);
 

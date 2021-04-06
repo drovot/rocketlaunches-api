@@ -31,13 +31,17 @@ class RocketController extends Controller
 
     /**
      * @param string $rocket
+     * @param Request $request
      * @return JsonResponse
      */
-    public function getRocket(string $rocket): JsonResponse
+    public function getRocket(string $rocket, Request $request): JsonResponse
     {
         $response = new Response();
 
         $result = $this->rocketManager->getRocketBySlug($rocket);
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         if ($result === null) {
             return $response->setStatusCode(404)->build();
@@ -57,6 +61,9 @@ class RocketController extends Controller
         // parameters
         $limit = $request->has("limit") ? (int) $request->get("limit") : Defaults::REQUEST_LIMIT;
         $page = $request->has("page") ? (int) $request->get("page") : Defaults::REQUEST_PAGE;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $rockets = $this->rocketManager->getRockets(
             Defaults::DATABASE_COLUMN_CREATED,
@@ -83,6 +90,9 @@ class RocketController extends Controller
         $name = $request->has("name") ? $request->get("name") : null;
         $wikiURL = $request->has("wikiURL") ? $request->get("wikiURL") : null;
         $imageURL = $request->has("imageURL") ? $request->get("imageURL") : null;
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $success = $this->rocketManager->createRocket(
             $name,
@@ -112,6 +122,9 @@ class RocketController extends Controller
         $imageURL = $request->has("imageURL") ? $request->get("imageURL") : null;
         $wikiURL = $request->has("wikiURL") ? $request->get("wikiURL") : null;
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         $success = $this->rocketManager->updateRocket(
             $rocket,
             $name,
@@ -129,11 +142,15 @@ class RocketController extends Controller
 
     /**
      * @param $rocket
+     * @param Request $request
      * @return JsonResponse
      */
-    public function deleteRocket($rocket): JsonResponse
+    public function deleteRocket($rocket, Request $request): JsonResponse
     {
         $response = new Response();
+
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
 
         $result = $this->rocketManager->getRocketBySlug($rocket);
 

@@ -9,6 +9,10 @@ use DateTime;
 class LaunchTime extends AbstractModel
 {
 
+    public const KEY_LAUNCH_WINDOW_OPEN = 'start_win_open';
+    public const KEY_LAUNCH_WINDOW_CLOSE = 'start_win_close';
+    public const KEY_LAUNCH_NET = 'start_net';
+
     /** @var DateTime|null  */
     private ?DateTime $launchWinOpen = null;
 
@@ -24,9 +28,9 @@ class LaunchTime extends AbstractModel
     public function export(): array
     {
         return [
-            "launchWinOpen" => $this->launchWinOpen,
-            "launchNet" => $this->launchNet,
-            "launchWinClose" => $this->launchWinClose
+            self::KEY_LAUNCH_WINDOW_OPEN => $this->launchWinOpen,
+            self::KEY_LAUNCH_WINDOW_CLOSE => $this->launchWinClose,
+            self::KEY_LAUNCH_NET => $this->launchNet
         ];
     }
 

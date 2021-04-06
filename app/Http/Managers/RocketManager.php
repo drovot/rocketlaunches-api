@@ -13,7 +13,7 @@ class RocketManager
     public const TABLE = "rl_rocket";
 
     private const SELECT = [
-        "id", "name", "slug", "imageURL", "wikiURL"
+        "id", "name", "slug", "image_url", "wiki_url"
     ];
 
     /**
@@ -97,8 +97,8 @@ class RocketManager
         return DB::table(self::TABLE)->insert([
             "name" => $name,
             "slug" => Utils::stringToSlug($name),
-            "wikiURL" => $wikiURL,
-            "imageURL" => $imageURL
+            "wiki_url" => $wikiURL,
+            "image_url" => $imageURL
         ]);
     }
 
@@ -171,12 +171,12 @@ class RocketManager
             $rocket->setSlug($result->slug);
         }
 
-        if (isset($result->wikiURL)) {
-            $rocket->setWikiURL($result->wikiURL);
+        if (isset($result->wiki_url)) {
+            $rocket->setWikiURL($result->wiki_url);
         }
 
-        if (isset($result->imageURL)) {
-            $rocket->setImageURL($result->imageURL);
+        if (isset($result->image_url)) {
+            $rocket->setImageURL($result->image_url);
         }
 
         return $rocket;
@@ -200,11 +200,11 @@ class RocketManager
         }
 
         if ($imageURL !== null) {
-            $array["imageURL"] = $imageURL;
+            $array["image_url"] = $imageURL;
         }
 
         if ($wikiURL !== null) {
-            $array["wikiURL"] = $wikiURL;
+            $array["wiki_url"] = $wikiURL;
         }
 
         return $array;
