@@ -30,8 +30,7 @@ class TrackingMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $trackingId = $this->trackingManager->handle($request);
-        $request->attributes->add(['tracking_id' => $trackingId]);
+        $this->trackingManager->handle($request);
         return $next($request);
     }
 }

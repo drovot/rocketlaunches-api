@@ -7,7 +7,10 @@ use Laravel\Lumen\Routing\Router;
 $router->get('/', ['uses' => 'Controller@index', 'as' => 'index', 'middleware' => 'tracking']);
 
 // SUPPLIER
-$router->post('/supplier/{supplier}', ['uses' => 'SupplierController@forcePull', 'as' => 'supplier.pull', 'middleware' => 'tracking|admin']); // admin
+$router->get('/supplier/{supplier}', ['uses' => 'SupplierController@forcePull', 'as' => 'supplier.pull', 'middleware' => 'tracking']);
+
+// REMINDERS
+$router->get('/reminders/daily', ['uses' => 'ReminderController@sendReminder', 'as' => 'reminder.send', 'middleware' => 'tracking']);
 
 // SEARCH
 $router->post('/advanced-search', ['uses' => 'SearchController@advancedSearch', 'as' => 'search.advanced', 'middleware' => 'tracking']);

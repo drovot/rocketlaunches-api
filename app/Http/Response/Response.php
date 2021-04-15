@@ -11,6 +11,12 @@ use Illuminate\Http\JsonResponse;
 class Response extends \Illuminate\Http\Response
 {
 
+    /** @var float $executionStart */
+    private float $executionStart;
+
+    /** @var float $executionEnd */
+    private float $executionEnd;
+
     /** @var mixed */
     private $result;
 
@@ -22,6 +28,12 @@ class Response extends \Illuminate\Http\Response
 
     /** @var string|null  */
     private ?string $trackingId = null;
+
+    public function __construct($content = '', $status = 200, array $headers = [])
+    {
+        parent::__construct($content, $status, $headers);
+        $this->executionStart = gettimeofday(true);
+    }
 
     /**
      * @return mixed
@@ -53,6 +65,39 @@ class Response extends \Illuminate\Http\Response
     public function getTrackingId(): ?string
     {
         return $this->trackingId;
+    }
+
+    /**
+     * get execution time in ms
+     *
+     * @return int|null
+     */
+    public function getExecutionTime(): ?int
+    {
+        if (
+            $this->executionStart === null
+            || $this->executionEnd === null
+        ) {
+            return null;
+        }
+
+        return (int) (($this->executionEnd - $this->executionStart) * 1000);
+    }
+
+    /**
+     * @return float
+     */
+    public function getExecutionStart()
+    {
+        return $this->executionStart;
+    }
+
+    /**
+     * @return float
+     */
+    public function getExecutionEnd(): float
+    {
+        return $this->executionEnd;
     }
 
     /**
@@ -124,6 +169,8 @@ class Response extends \Illuminate\Http\Response
 
     public function build(): JsonResponse
     {
+        $this->executionEnd = gettimeofday(true);
+
         if ($this->trackingId !== null) {
             $trackingManager = new TrackingManager();
             $trackingManager->update($this->trackingId, $this);
