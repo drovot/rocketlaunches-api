@@ -35,29 +35,29 @@ class TrackingManager
 
     /**
      * @param Request $request
-     * @return string tracking id
      */
-    public function handle(Request $request): string
+    public function handle(Request $request): void
     {
         $trackingId = Utils::generateString();
         $requestPath = $request->getPathInfo();
         $requestMethod = $request->route()[1]['as'];
         $requestMethodType = $request->method();
+        $clientIp = $request->getClientIp();
         $requestSuccess = 0;
         $requestStatusCode = self::STATUS_PENDING;
-        $clientIp = $request->getClientIp();
 
-        DB::table(self::TABLE)->insert([
-            'tracking_id' => $trackingId,
-            'request_path' => $requestPath,
-            'request_method' => $requestMethod,
-            'request_method_type' => $requestMethodType,
-            'request_success' => $requestSuccess,
-            'request_status_code' => $requestStatusCode,
-            'client_ip' => $clientIp,
-        ]);
+        $request->attributes->add(['tracking_id' => $trackingId]);
 
-        return $trackingId;
+        DB::table(self::TABLE)
+            ->insert([
+                'tracking_id' => $trackingId,
+                'request_path' => $requestPath,
+                'request_method' => $requestMethod,
+                'request_method_type' => $requestMethodType,
+                'request_success' => $requestSuccess,
+                'request_status_code' => $requestStatusCode,
+                'client_ip' => $clientIp,
+            ]);
     }
 
     /**
@@ -70,11 +70,13 @@ class TrackingManager
         $requestSuccess = $response->isSuccessful();
         $requestStatusCode = $response->getStatusCode();
 
-        DB::table(self::TABLE)->where('tracking_id', '=', $requestId)
+        DB::table(self::TABLE)
+            ->where('tracking_id', '=', $requestId)
             ->update([
                 'request_success' => $requestSuccess,
                 'request_status_code' => $requestStatusCode,
                 'request_detailed' => $detailed,
+                'request_execution_time' => $response->getExecutionTime(),
             ]);
     }
 }

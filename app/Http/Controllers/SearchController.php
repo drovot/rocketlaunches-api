@@ -8,8 +8,9 @@ use App\Http\Response\Response;
 use App\Http\Search\SearchManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Lumen\Routing\Controller as BaseController;
 
-class SearchController
+class SearchController extends BaseController
 {
 
     private SearchManager $searchManager;
@@ -22,7 +23,8 @@ class SearchController
     public function advancedSearch(Request $request): JsonResponse
     {
         $query = $request->has("query") ? $request->get("query") : null;
-        $search = $this->searchManager->advancedSearch($query);
+        $type = $request->has("type") ? $request->get("type") : null;
+        $search = $this->searchManager->advancedSearch($query, $type);
         $response = new Response();
 
         $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;

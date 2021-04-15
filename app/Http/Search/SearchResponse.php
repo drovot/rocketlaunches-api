@@ -13,6 +13,9 @@ class SearchResponse extends AbstractModel
     private string $title;
 
     /** @var string  */
+    private string $slug;
+
+    /** @var string  */
     private string $subtitle;
 
     /** @var string  */
@@ -30,6 +33,14 @@ class SearchResponse extends AbstractModel
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSlug(): string
+    {
+        return $this->slug;
     }
 
     /**
@@ -73,6 +84,14 @@ class SearchResponse extends AbstractModel
     }
 
     /**
+     * @param string $slug
+     */
+    public function setSlug(string $slug): void
+    {
+        $this->slug = $slug;
+    }
+
+    /**
      * @param string $subtitle
      */
     public function setSubtitle(string $subtitle): void
@@ -111,6 +130,7 @@ class SearchResponse extends AbstractModel
     {
         return [
             "title" => $this->title,
+            "slug" => $this->slug,
             "subtitle" => $this->subtitle,
             "path" => $this->path,
             "imageURL" => $this->imageURL,

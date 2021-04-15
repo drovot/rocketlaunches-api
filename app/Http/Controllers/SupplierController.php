@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Response\Response;
-use App\Http\Search\SearchManager;
-use App\Models\AbstractModel;
 use App\Supplier\AbstractSupplier;
 use App\Supplier\SupplierManager;
 use Illuminate\Http\JsonResponse;
@@ -28,19 +26,23 @@ class SupplierController
 
     /**
      * @param $supplier
+     * @param Request $request
      * @return JsonResponse
      */
-    public function forcePull($supplier): JsonResponse
+    public function forcePull($supplier, Request $request): JsonResponse
     {
         $response = new Response();
         $check = $this->supplierManager->initializeSuppliers($supplier);
         $launches = [];
 
+        $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
+        $response->setTrackingId($trackingId);
+
         if (!$check) {
-            return $response->setStatusCode(400)->setErrorMessage(sprintf("Unknown Supplier Type '%s'", $supplier))->build();
+            return $response->setStatusCode(400)->setErrorMessage(sprintf("Unknown Supplier '%s'", $supplier))->build();
         }
 
-        /** @var AbstractSupplier $supplier */
+        /** @var AbstractSupplier $supplierModel */
         foreach ($this->supplierManager->getSuppliers() as $supplierModel) {
             $launches[] = $supplierModel->execute();
         }

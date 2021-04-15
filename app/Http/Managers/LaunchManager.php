@@ -21,7 +21,7 @@ class LaunchManager
 
     public const TABLE = "rl_launch";
 
-    private const SELECT = [
+    public const SELECT = [
         "rl_launch.id as id",
         "rl_launch.name as name",
         "rl_launch.slug as slug",
@@ -316,7 +316,7 @@ class LaunchManager
      * @param bool $detailed
      * @return Launch
      */
-    private function buildLaunchFromDatabaseResult($result, bool $detailed = Defaults::REQUEST_DETAILED): Launch
+    public function buildLaunchFromDatabaseResult($result, bool $detailed = Defaults::REQUEST_DETAILED): Launch
     {
         $launch = new Launch();
 
@@ -511,7 +511,7 @@ class LaunchManager
 
     /**
      * @param string $originalSlug
-     * @param string $slug
+     * @param string|null $slug
      * @param string|null $name
      * @param string|null $description
      * @param Rocket|null $rocket
@@ -526,7 +526,7 @@ class LaunchManager
      */
     public function updateLaunch(
         string $originalSlug,
-        string $slug,
+        ?string $slug,
         ?string $name,
         ?string $description,
         ?Rocket $rocket,

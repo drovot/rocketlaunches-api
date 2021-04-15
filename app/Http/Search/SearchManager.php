@@ -29,11 +29,16 @@ class SearchManager
 
     /**
      * @param string $query
+     * @param string|null $typeOnly
      * @return array|null
      */
-    public function advancedSearch(string $query): ?array
+    public function advancedSearch(string $query, ?string $typeOnly = null): ?array
     {
         $searchResponses = [];
+
+        if ($typeOnly !== null) {
+            return $this->searchByType($typeOnly, $query);
+        }
 
         foreach (self::TYPES as $type) {
             $result = $this->searchByType($type, $query);
@@ -55,7 +60,7 @@ class SearchManager
      * @param string $query
      * @return SearchResponse[]|array|null
      */
-    private function searchByType(string $type, string $query): ?array
+    private function searchByType(string $type, string $query, $admin = false): ?array
     {
         $searchResponses = [];
         $response = null;
@@ -85,6 +90,7 @@ class SearchManager
         foreach ($response as $item) {
             $searchResponse = new SearchResponse();
             $searchResponse->setCategory($type);
+            $searchResponse->setSlug($item->slug);
             $searchResponse->setPath("/$type/" . $item->slug);
             $searchResponse->setImageURL($item->imageURL ?? null);
             $searchResponse->setTitle($item->name ?? "");

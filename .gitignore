@@ -1,8 +1,7 @@
 /vendor
 /.idea
-/app/Supplier
 Homestead.json
 Homestead.yaml
 .env
-.env.local
+.env.*
 .phpunit.result.cache
