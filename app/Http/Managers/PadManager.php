@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Managers;
 
+use App\Models\Location;
 use App\Models\Pad;
 use Illuminate\Support\Facades\DB;
 
@@ -11,9 +12,27 @@ class PadManager
 {
 
     public const TABLE = "rl_pad";
+
     public const SELECT = [
-        "id", "name", "slug", "wiki_url", "image_url"
+        Pad::KEY_ID,
+        Pad::KEY_NAME,
+        Pad::KEY_SLUG,
+        Pad::KEY_IMAGE_URL,
+        Pad::KEY_WIKI_URL,
+        Pad::KEY_LOCATION_ID,
+        Pad::KEY_ID,
     ];
+
+    /** @var LocationManager */
+    private LocationManager $locationManager;
+
+    /**
+     * PadManager constructor.
+     */
+    public function __construct()
+    {
+        $this->locationManager = new LocationManager();
+    }
 
     /**
      * @param int|string $id
@@ -23,7 +42,7 @@ class PadManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("id", "=", $id)
+            ->where(Pad::KEY_ID, "=", $id)
             ->first();
 
         if ($result === null) {
@@ -41,7 +60,7 @@ class PadManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("slug", "=", $slug)
+            ->where(Pad::KEY_SLUG, "=", $slug)
             ->first();
 
         if ($result === null) {
@@ -59,6 +78,13 @@ class PadManager
         return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
     }
 
+    /**
+     * @param string $orderBy
+     * @param string $orderMethod
+     * @param int $limit
+     * @param int $page
+     * @return array
+     */
     public function getPads(string $orderBy, string $orderMethod, int $limit, int $page): array
     {
         $providers = [];
@@ -105,13 +131,25 @@ class PadManager
             $pad->setImageURL($result->image_url);
         }
 
+        if (isset($result->location_id)) {
+            $this->locationManager->getLocationById($result->location_id);
+        }
+
         return $pad;
     }
 
+    /**
+     * @param string $name
+     * @param string|null $wikiURL
+     * @param string|null $imageURL
+     * @param Location|null $location
+     * @return bool
+     */
     public function createPad(
         string $name,
         ?string $wikiURL,
-        ?string $imageURL
+        ?string $imageURL,
+        ?Location $location
     ): bool {
         $provider = $this->getPadBySlug(Utils::stringToSlug($name));
 
@@ -120,10 +158,11 @@ class PadManager
         }
 
         return DB::table(self::TABLE)->insert([
-            "name" => $name,
-            "slug" => Utils::stringToSlug($name),
-            "wiki_url" => $wikiURL,
-            "image_url" => $imageURL,
+            Pad::KEY_NAME => $name,
+            Pad::KEY_SLUG => Utils::stringToSlug($name),
+            Pad::KEY_WIKI_URL => $wikiURL,
+            Pad::KEY_IMAGE_URL => $imageURL,
+            Pad::KEY_LOCATION_ID => $location === null ? null : $location->getId()
         ]);
     }
 
@@ -132,7 +171,7 @@ class PadManager
      */
     public function deletePad($slug): void
     {
-        DB::table(self::TABLE)->where("slug", "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Pad::KEY_SLUG, "=", $slug)->delete();
     }
 
     /**
@@ -140,29 +179,33 @@ class PadManager
      * @param string|null $name
      * @param string|null $wikiURL
      * @param string|null $imageURL
+     * @param Location|null $location
      * @return bool
      */
     public function updatePad(
         string $slug,
         ?string $name,
         ?string $wikiURL,
-        ?string $imageURL
+        ?string $imageURL,
+        ?Location $location
     ): bool {
-        $provider = $this->getPadBySlug($slug);
+        $pad = $this->getPadBySlug($slug);
 
-        if ($provider === null) {
+        if ($pad === null) {
             return false;
         }
 
         DB::table(self::TABLE)
-            ->where("slug", "=", $slug)
+            ->where(Pad::KEY_SLUG, "=", $pad->getSlug())
             ->update(
                 $this->buildUpdateArray(
                     $name,
                     $wikiURL,
-                    $imageURL
+                    $imageURL,
+                    $location
                 )
             );
+
         return true;
     }
 
@@ -170,25 +213,31 @@ class PadManager
      * @param string $name
      * @param string|null $wikiURL
      * @param string|null $imageURL
+     * @param Location|null $location
      * @return array
      */
     public function buildUpdateArray(
         string $name,
         ?string $wikiURL,
-        ?string $imageURL
+        ?string $imageURL,
+        ?Location $location
     ): array {
         $array = [];
 
         if ($name !== null) {
-            $array['name'] = $name;
+            $array[Pad::KEY_NAME] = $name;
         }
 
         if ($wikiURL !== null) {
-            $array['wiki_url'] = $wikiURL;
+            $array[Pad::KEY_WIKI_URL] = $wikiURL;
         }
 
         if ($imageURL !== null) {
-            $array['image_url'] = $imageURL;
+            $array[Pad::KEY_IMAGE_URL] = $imageURL;
+        }
+
+        if ($location !== null) {
+            $array[Pad::KEY_LOCATION_ID] = $location->getId();
         }
 
         return $array;

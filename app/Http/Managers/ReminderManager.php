@@ -6,7 +6,11 @@ namespace App\Http\Managers;
 
 use App\Http\Reminders\ReminderTemplateGenerator;
 use App\Models\Launch;
+use App\Models\LaunchTime;
+use App\Models\Pad;
+use App\Models\Provider;
 use App\Models\Reminder;
+use App\Models\Rocket;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -38,9 +42,9 @@ class ReminderManager
         try {
             DB::table(self::REMINDER_TABLE)
                 ->insert([
-                    "title" => $reminder->getTitle(),
-                    "launches" => json_encode([$reminder->getLaunch()->getSlug()], JSON_THROW_ON_ERROR),
-                    "user_id" => $reminder->getUser()->getId()
+                    Reminder::KEY_TITLE => $reminder->getTitle(),
+                    Reminder::KEY_LAUNCH => json_encode([$reminder->getLaunch()->getSlug()], JSON_THROW_ON_ERROR),
+                    Reminder::KEY_USER_ID => $reminder->getUser()->getId()
                 ]);
         } catch (\JsonException $exception) {
             return false;
@@ -88,11 +92,11 @@ class ReminderManager
         $launches = [];
         $result = DB::table(LaunchManager::TABLE)
             ->select(LaunchManager::SELECT)
-            ->join("rl_rocket", "rl_rocket.id", "=", "rl_launch.rocket_id")
-            ->join("rl_provider", "rl_provider.id", "=", "rl_launch.provider_id")
-            ->join("rl_pad", "rl_pad.id", "=", "rl_launch.pad_id")
-            ->whereDate("start_net", Carbon::now()->format("Y-m-d"))
-            ->where("published", "=", 1)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, RocketManager::TABLE . "." . Provider::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_PAD_ID)
+            ->whereDate(LaunchTime::KEY_LAUNCH_NET, Carbon::now()->format("Y-m-d"))
+            ->where(Launch::KEY_PUBLISHED, "=", 1)
             ->get();
 
         foreach ($result as $item) {

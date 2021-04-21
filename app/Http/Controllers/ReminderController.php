@@ -9,8 +9,9 @@ use App\Http\Response\Response;
 use App\Models\Reminder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Lumen\Routing\Controller as BaseController;
 
-class ReminderController
+class ReminderController extends BaseController
 {
 
     private const REMINDER_TITLE_SINGLE = '%s will launch today!';

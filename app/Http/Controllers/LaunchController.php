@@ -14,8 +14,9 @@ use App\Http\Managers\Utils;
 use App\Http\Response\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Laravel\Lumen\Routing\Controller as BaseController;
 
-class LaunchController extends Controller
+class LaunchController extends BaseController
 {
 
     /** @var LaunchManager  */

@@ -9,8 +9,9 @@ use App\Supplier\AbstractSupplier;
 use App\Supplier\SupplierManager;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Laravel\Lumen\Routing\Controller as BaseController;
 
-class SupplierController
+class SupplierController extends BaseController
 {
 
     /** @var SupplierManager  */
