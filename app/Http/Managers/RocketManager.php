@@ -13,7 +13,11 @@ class RocketManager
     public const TABLE = "rl_rocket";
 
     private const SELECT = [
-        "id", "name", "slug", "image_url", "wiki_url"
+        Rocket::KEY_ID,
+        Rocket::KEY_NAME,
+        Rocket::KEY_SLUG,
+        Rocket::KEY_IMAGE_URL,
+        Rocket::KEY_WIKI_URL
     ];
 
     /**
@@ -24,7 +28,7 @@ class RocketManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("id", "=", $id)
+            ->where(Rocket::KEY_ID, "=", $id)
             ->first();
 
         if ($result === null) {
@@ -42,7 +46,7 @@ class RocketManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("slug", "=", $slug)
+            ->where(Rocket::KEY_SLUG, "=", $slug)
             ->first();
 
         if ($result === null) {
@@ -95,10 +99,10 @@ class RocketManager
         }
 
         return DB::table(self::TABLE)->insert([
-            "name" => $name,
-            "slug" => Utils::stringToSlug($name),
-            "wiki_url" => $wikiURL,
-            "image_url" => $imageURL
+            Rocket::KEY_NAME => $name,
+            Rocket::KEY_SLUG => Utils::stringToSlug($name),
+            Rocket::KEY_WIKI_URL => $wikiURL,
+            Rocket::KEY_IMAGE_URL => $imageURL
         ]);
     }
 
@@ -121,11 +125,12 @@ class RocketManager
             return false;
         }
 
-        DB::table(self::TABLE)->where("slug", "=", $slug)->update($this->buildUpdateArray(
-            $name,
-            $imageURL,
-            $wikiURL
-        ));
+        DB::table(self::TABLE)->where(Rocket::KEY_NAME, "=", $slug)
+            ->update($this->buildUpdateArray(
+                $name,
+                $imageURL,
+                $wikiURL
+            ));
         return true;
     }
 
@@ -140,7 +145,7 @@ class RocketManager
             return;
         }
 
-        DB::table(self::TABLE)->where("slug", "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Rocket::KEY_SLUG, "=", $slug)->delete();
     }
 
     /**
@@ -196,15 +201,15 @@ class RocketManager
         $array = [];
 
         if ($name !== null) {
-            $array["name"] = $name;
+            $array[Rocket::KEY_NAME] = $name;
         }
 
         if ($imageURL !== null) {
-            $array["image_url"] = $imageURL;
+            $array[Rocket::KEY_IMAGE_URL] = $imageURL;
         }
 
         if ($wikiURL !== null) {
-            $array["wiki_url"] = $wikiURL;
+            $array[Rocket::KEY_WIKI_URL] = $wikiURL;
         }
 
         return $array;

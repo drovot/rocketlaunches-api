@@ -46,7 +46,7 @@ class TrackingManager
         $requestSuccess = 0;
         $requestStatusCode = self::STATUS_PENDING;
 
-        $request->attributes->add(['tracking_id' => $trackingId]);
+        $request->attributes->set('tracking_id', $trackingId);
 
         DB::table(self::TABLE)
             ->insert([

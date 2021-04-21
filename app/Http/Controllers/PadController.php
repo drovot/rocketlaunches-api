@@ -10,8 +10,9 @@ use App\Http\Managers\Utils;
 use App\Http\Response\Response;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Laravel\Lumen\Routing\Controller as BaseController;
 
-class PadController extends Controller
+class PadController extends BaseController
 {
 
     /**

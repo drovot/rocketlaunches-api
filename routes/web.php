@@ -4,7 +4,7 @@
 use Laravel\Lumen\Routing\Router;
 
 // INDEX
-$router->get('/', ['uses' => 'Controller@index', 'as' => 'index', 'middleware' => 'tracking']);
+$router->get('/', ['uses' => 'Controller@index', 'as' => 'index']);
 
 // SUPPLIER
 $router->get('/supplier/{supplier}', ['uses' => 'SupplierController@forcePull', 'as' => 'supplier.pull', 'middleware' => 'tracking']);
@@ -14,6 +14,12 @@ $router->get('/reminders/daily', ['uses' => 'ReminderController@sendReminder', '
 
 // SEARCH
 $router->post('/advanced-search', ['uses' => 'SearchController@advancedSearch', 'as' => 'search.advanced', 'middleware' => 'tracking']);
+
+// USER
+$router->get('/user', ['uses' => 'UserController@getUser', 'as' => 'user.get', 'middleware' => 'authentication|tracking']);
+$router->post('/user', ['uses' => 'UserController@createUser', 'as' => 'user.create', 'middleware' => 'authentication|tracking']);
+$router->put('/user', ['uses' => 'UserController@updateUser', 'as' => 'user.update', 'middleware' => 'authentication|tracking']);
+$router->delete('/user', ['uses' => 'UserController@deleteUser', 'as' => 'user.delete', 'middleware' => 'authentication|tracking']);
 
 // LAUNCH
 $router->get('/launch', ['uses' => 'LaunchController@getLaunches', 'as' => 'launch.list', 'middleware' => 'tracking|admin']); // admin

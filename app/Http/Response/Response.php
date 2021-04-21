@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace App\Http\Response;
 
+use App\Http\Managers\Defaults;
 use App\Models\AbstractModel;
 use App\Tracking\TrackingManager;
 use Illuminate\Http\JsonResponse;
 
 class Response extends \Illuminate\Http\Response
 {
+
+    private const URL_TEMPLATE = '%s%s?limit=%s&page=%s&detailed=%s';
 
     /** @var float $executionStart */
     private float $executionStart;
@@ -23,16 +26,20 @@ class Response extends \Illuminate\Http\Response
     /** @var int|string */
     private $total = 0;
 
-    /** @var string|null  */
+    /** @var string|null */
     private ?string $errorMessage = null;
 
-    /** @var string|null  */
+    /** @var string|null */
     private ?string $trackingId = null;
+
+    /** @var array */
+    private array $requestParameters;
 
     public function __construct($content = '', $status = 200, array $headers = [])
     {
         parent::__construct($content, $status, $headers);
         $this->executionStart = gettimeofday(true);
+        $this->requestParameters = request()->request->all();
     }
 
     /**
@@ -87,7 +94,7 @@ class Response extends \Illuminate\Http\Response
     /**
      * @return float
      */
-    public function getExecutionStart()
+    public function getExecutionStart(): float
     {
         return $this->executionStart;
     }
@@ -144,6 +151,27 @@ class Response extends \Illuminate\Http\Response
         return $this;
     }
 
+    // if $next is false, the last url will generate
+    private function generateUrl(bool $next): ?string
+    {
+        $limit = $this->requestParameters["limit"] ?? Defaults::REQUEST_LIMIT;
+        $page = $this->requestParameters["page"] ?? Defaults::REQUEST_PAGE;
+        $detailed = $this->requestParameters["detailed"] ?? Defaults::REQUEST_DETAILED;
+
+        if (!$next && $page === 1) {
+            return null;
+        }
+
+        return sprintf(
+            self::URL_TEMPLATE,
+            env("APP_URL"),
+            request()->server->get("PATH_INFO"),
+            $limit,
+            $next ? ($page + 1) : ($page - 1),
+            $detailed ? '1' : '0'
+        );
+    }
+
     private function recursiveExport($data): array
     {
         if ($data instanceof AbstractModel) {
@@ -173,11 +201,11 @@ class Response extends \Illuminate\Http\Response
 
         if ($this->trackingId !== null) {
             $trackingManager = new TrackingManager();
-            $trackingManager->update($this->trackingId, $this);
+            $trackingManager->update($this->trackingId, $this, $this->requestParameters["detailed"] ?? null);
         }
 
         $output = [
-            "success" => $this->statusCode === 200,
+            "success" => $this->statusCode >= 200 && $this->statusCode <= 299,
             "method" => \request()->route()[1]['as'],
             "statusCode" => $this->statusCode,
             "statusText" => $this->statusText
@@ -189,6 +217,8 @@ class Response extends \Illuminate\Http\Response
 
         if (!is_object($this->result) && (is_array($this->result) || is_countable($this->result))) {
             $output["count"] = count($this->result);
+            $output["last"] = $this->generateUrl(false);
+            $output["next"] = $this->generateUrl(true);
         }
 
         if ($this->total > 0) {

@@ -12,7 +12,12 @@ class ProviderManager
 
     public const TABLE = "rl_provider";
     public const SELECT = [
-        "id", "name", "slug", "abbreviation", "wiki_url", "image_url", "logo_url"
+        Provider::KEY_ID,
+        Provider::KEY_SLUG,
+        Provider::KEY_ABBREVIATION,
+        Provider::KEY_WIKI_URL,
+        Provider::KEY_IMAGE_URL,
+        Provider::KEY_LOGO_URL
     ];
 
     /**
@@ -23,7 +28,7 @@ class ProviderManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("id", "=", $id)
+            ->where(Provider::KEY_ID, "=", $id)
             ->first();
 
         if ($result === null) {
@@ -41,7 +46,7 @@ class ProviderManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where("slug", "=", $slug)
+            ->where(Provider::KEY_SLUG, "=", $slug)
             ->first();
 
         if ($result === null) {
@@ -137,12 +142,12 @@ class ProviderManager
         }
 
         return DB::table(self::TABLE)->insert([
-            "name" => $name,
-            "slug" => Utils::stringToSlug($name),
-            "abbreviation" => $abbreviation,
-            "wiki_url" => $wikiURL,
-            "image_url" => $imageURL,
-            "logo_url" => $logoURL,
+            Provider::KEY_NAME => $name,
+            Provider::KEY_SLUG => Utils::stringToSlug($name),
+            Provider::KEY_ABBREVIATION => $abbreviation,
+            Provider::KEY_WIKI_URL => $wikiURL,
+            Provider::KEY_IMAGE_URL => $imageURL,
+            Provider::KEY_LOGO_URL => $logoURL,
         ]);
     }
 
@@ -151,7 +156,7 @@ class ProviderManager
      */
     public function deleteProvider($slug): void
     {
-        DB::table(self::TABLE)->where("slug", "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Provider::KEY_SLUG, "=", $slug)->delete();
     }
 
     /**
@@ -178,7 +183,7 @@ class ProviderManager
         }
 
         DB::table(self::TABLE)
-            ->where("slug", "=", $slug)
+            ->where(Provider::KEY_SLUG, "=", $slug)
             ->update(
                 $this->buildUpdateArray(
                     $name,
@@ -209,23 +214,23 @@ class ProviderManager
         $array = [];
 
         if ($name !== null) {
-            $array['name'] = $name;
+            $array[Provider::KEY_NAME] = $name;
         }
 
         if ($abbreviation !== null) {
-            $array['abbreviation'] = $abbreviation;
+            $array[Provider::KEY_SLUG] = $abbreviation;
         }
 
         if ($wikiURL !== null) {
-            $array['wiki_url'] = $wikiURL;
+            $array[Provider::KEY_WIKI_URL] = $wikiURL;
         }
 
         if ($imageURL !== null) {
-            $array['image_url'] = $imageURL;
+            $array[Provider::KEY_IMAGE_URL] = $imageURL;
         }
 
         if ($logoURL !== null) {
-            $array['logo_url'] = $logoURL;
+            $array[Provider::KEY_LOGO_URL] = $logoURL;
         }
 
         return $array;

@@ -10,16 +10,27 @@ class LaunchStatus extends AbstractModel
 {
 
     public const KEY_ID = 'id';
-    public const KEY_DISPLAY_NAME = 'name';
-    public const KEY_CANCELLED = 'slug';
+    public const KEY_LAUNCH_ID = 'launch_id';
+    public const KEY_NAME = 'name';
+    public const KEY_PROBABILITY = 'probability';
+    public const KEY_TBD = 'tbd';
 
     use HasId;
 
-    /** @var string|null  */
-    private ?string $displayName = null;
+    /** @var int|string */
+    private $launchId;
 
-    /** @var bool|null  */
-    private ?bool $cancelled = false;
+    /** @var string|null */
+    private ?string $name = null;
+
+    /** @var string|null */
+    private ?string $description = null;
+
+    /** @var float */
+    private float $probability = 0;
+
+    /** @var bool|null */
+    private ?bool $tbd = false;
 
     /**
      * @return array
@@ -27,47 +38,82 @@ class LaunchStatus extends AbstractModel
     public function export(): array
     {
         return [
-            self::KEY_ID => $this->id,
-            self::KEY_DISPLAY_NAME => $this->displayName,
-            self::KEY_CANCELLED => $this->cancelled
+            self::KEY_NAME => $this->name,
+            self::KEY_PROBABILITY => $this->probability,
+            self::KEY_TBD => $this->tbd
         ];
     }
 
     /**
-     * @return string
+     * @return int|string
      */
-    public function getDisplayName(): string
+    public function getLaunchId()
     {
-        return $this->displayName;
+        return $this->launchId;
+    }
+
+    /**
+     * @param int|string $launchId
+     * @return LaunchStatus
+     */
+    public function setLaunchId($launchId): self
+    {
+        $this->launchId = $launchId;
+
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     * @return LaunchStatus
+     */
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getProbability()
+    {
+        return $this->probability;
+    }
+
+    /**
+     * @param float $probability
+     * @return LaunchStatus
+     */
+    public function setProbability(float $probability): self
+    {
+        $this->probability = $probability;
+
+        return $this;
     }
 
     /**
      * @return bool
      */
-    public function isCancelled(): bool
+    public function isTBD(): bool
     {
-        return $this->cancelled;
+        return $this->tbd ?? false;
     }
 
     /**
-     * @param bool $cancelled
-     * @return self
+     * @param bool $tbd
      */
-    public function setCancelled(bool $cancelled): self
+    public function setTBD(bool $tbd): void
     {
-        $this->cancelled = $cancelled;
-
-        return $this;
-    }
-
-    /**
-     * @param string $displayName
-     * @return self
-     */
-    public function setDisplayName(string $displayName): self
-    {
-        $this->displayName = $displayName;
-
-        return $this;
+        $this->tbd = $tbd;
     }
 }

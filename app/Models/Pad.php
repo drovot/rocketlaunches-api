@@ -16,15 +16,20 @@ class Pad extends AbstractModel
     public const KEY_SLUG = 'slug';
     public const KEY_WIKI_URL = 'wiki_url';
     public const KEY_IMAGE_URL = 'image_url';
+    public const KEY_LOCATION = 'location';
+    public const KEY_LOCATION_ID = 'location_id';
 
     use HasId;
     use HasNameSlug;
 
-    /** @var string|null  */
+    /** @var string|null */
     private ?string $wikiURL = null;
 
-    /** @var string|null  */
+    /** @var string|null */
     private ?string $imageURL = null;
+
+    /** @var Location */
+    private Location $location;
 
     /**
      * @return array
@@ -37,6 +42,7 @@ class Pad extends AbstractModel
             self::KEY_SLUG => $this->slug,
             self::KEY_WIKI_URL => $this->wikiURL,
             self::KEY_IMAGE_URL => $this->imageURL,
+            self::KEY_LOCATION => $this->location->export(),
         ];
     }
 
@@ -46,14 +52,6 @@ class Pad extends AbstractModel
     public function getWikiURL(): ?string
     {
         return $this->wikiURL;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getImageURL(): ?string
-    {
-        return $this->imageURL;
     }
 
     /**
@@ -68,12 +66,39 @@ class Pad extends AbstractModel
     }
 
     /**
+     * @return string|null
+     */
+    public function getImageURL(): ?string
+    {
+        return $this->imageURL;
+    }
+
+    /**
      * @param string|null $imageURL
      * @return self
      */
     public function setImageURL(?string $imageURL): self
     {
         $this->imageURL = $imageURL;
+
+        return $this;
+    }
+
+    /**
+     * @return Location
+     */
+    public function getLocation(): Location
+    {
+        return $this->location;
+    }
+
+    /**
+     * @param Location $location
+     * @return self
+     */
+    public function setLocation(Location $location): self
+    {
+        $this->location = $location;
 
         return $this;
     }
