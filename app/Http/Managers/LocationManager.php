@@ -11,10 +11,10 @@ use Illuminate\Support\Facades\DB;
 class LocationManager
 {
 
-    public const TABLE = 'location';
+    public const TABLE = 'rl_location';
+
     public const SELECT = [
         Location::KEY_ID,
-        Location::KEY_SLUG,
         Location::KEY_NAME,
         Location::KEY_COUNTRY_CODE,
         Location::KEY_LATITUDE,
@@ -40,14 +40,14 @@ class LocationManager
     }
 
     /**
-     * @param string $slug
+     * @param string $name
      * @return Location|null
      */
-    public function getLocationBySlug(string $slug): ?Location
+    public function getLocationByName(string $name): ?Location
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Launch::KEY_SLUG, '=', $slug)
+            ->where(Launch::KEY_NAME, '=', $name)
             ->first();
 
         if ($result === null) {
@@ -60,24 +60,21 @@ class LocationManager
     /**
      * @param string|null $name
      * @param string|null $countryCode
-     * @param float|null $latitude
-     * @param float|null $longitude
+     * @param float|string|null $latitude
+     * @param float|string|null $longitude
      * @return Location|null
      */
-    public function createLocation(string $name, ?string $countryCode, ?float $latitude, ?float $longitude): ?Location
+    public function createLocation(string $name, ?string $countryCode, $latitude, $longitude): ?Location
     {
-        $slug = Utils::stringToSlug($name);
-
-        DB::table(self::TABLE)
-            ->insert([
+        $id = DB::table(self::TABLE)
+            ->insertGetId([
                 Location::KEY_NAME => $name,
-                Location::KEY_SLUG => $slug,
                 Location::KEY_COUNTRY_CODE => $countryCode,
                 Location::KEY_LATITUDE => $latitude,
                 Location::KEY_LONGITUDE => $longitude,
             ]);
 
-        return $this->getLocationBySlug($slug);
+        return $this->getLocationByID($id);
     }
 
     /**
@@ -94,10 +91,6 @@ class LocationManager
 
         if (isset($result->name)) {
             $location->setName($result->name);
-        }
-
-        if (isset($result->slug)) {
-            $location->setSlug($result->slug);
         }
 
         if (isset($result->country_code)) {

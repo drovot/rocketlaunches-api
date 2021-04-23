@@ -28,8 +28,8 @@ class Pad extends AbstractModel
     /** @var string|null */
     private ?string $imageURL = null;
 
-    /** @var Location */
-    private Location $location;
+    /** @var ?Location */
+    private ?Location $location = null;
 
     /**
      * @return array
@@ -42,7 +42,7 @@ class Pad extends AbstractModel
             self::KEY_SLUG => $this->slug,
             self::KEY_WIKI_URL => $this->wikiURL,
             self::KEY_IMAGE_URL => $this->imageURL,
-            self::KEY_LOCATION => $this->location->export(),
+            self::KEY_LOCATION => $this->location === null ? null : $this->location->export(),
         ];
     }
 

@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class PadManager
 {
 
-    public const TABLE = "rl_pad";
+    public const TABLE = 'rl_pad';
 
     public const SELECT = [
         Pad::KEY_ID,

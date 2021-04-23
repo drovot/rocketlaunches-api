@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 class RocketManager
 {
 
-    public const TABLE = "rl_rocket";
+    public const TABLE = 'rl_rocket';
 
     private const SELECT = [
         Rocket::KEY_ID,

@@ -36,8 +36,8 @@ class Launch extends AbstractModel
     /** @var string|null  */
     private ?string $description = null;
 
-    /** @var LaunchStatus|null  */
-    private ?LaunchStatus $status = null;
+    /** @var Status|null  */
+    private ?Status $status = null;
 
     /** @var Rocket|null  */
     private ?Rocket $rocket = null;
@@ -128,9 +128,9 @@ class Launch extends AbstractModel
     }
 
     /**
-     * @return LaunchStatus|null
+     * @return Status|null
      */
-    public function getStatus(): ?LaunchStatus
+    public function getStatus(): ?Status
     {
         return $this->status;
     }
@@ -260,10 +260,10 @@ class Launch extends AbstractModel
     }
 
     /**
-     * @param LaunchStatus $status
+     * @param Status|null $status
      * @return self
      */
-    public function setStatus(LaunchStatus $status): self
+    public function setStatus(?Status $status): self
     {
         $this->status = $status;
 
