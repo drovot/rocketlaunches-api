@@ -6,7 +6,7 @@ namespace App\Models;
 
 use App\Models\Utils\HasId;
 
-class LaunchStatus extends AbstractModel
+class Status extends AbstractModel
 {
 
     public const KEY_ID = 'id';
@@ -17,14 +17,11 @@ class LaunchStatus extends AbstractModel
 
     use HasId;
 
-    /** @var int|string */
-    private $launchId;
+    /** @var string|null */
+    private ?string $launchId = null;
 
     /** @var string|null */
     private ?string $name = null;
-
-    /** @var string|null */
-    private ?string $description = null;
 
     /** @var float */
     private float $probability = 0;
@@ -45,18 +42,18 @@ class LaunchStatus extends AbstractModel
     }
 
     /**
-     * @return int|string
+     * @return string|null
      */
-    public function getLaunchId()
+    public function getLaunchId(): ?string
     {
         return $this->launchId;
     }
 
     /**
-     * @param int|string $launchId
-     * @return LaunchStatus
+     * @param string|null $launchId
+     * @return self
      */
-    public function setLaunchId($launchId): self
+    public function setLaunchId(?string $launchId): self
     {
         $this->launchId = $launchId;
 
@@ -73,7 +70,7 @@ class LaunchStatus extends AbstractModel
 
     /**
      * @param string|null $name
-     * @return LaunchStatus
+     * @return Status
      */
     public function setName(?string $name): self
     {
@@ -92,7 +89,7 @@ class LaunchStatus extends AbstractModel
 
     /**
      * @param float $probability
-     * @return LaunchStatus
+     * @return Status
      */
     public function setProbability(float $probability): self
     {

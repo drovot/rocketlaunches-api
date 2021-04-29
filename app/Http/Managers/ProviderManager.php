@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\DB;
 class ProviderManager
 {
 
-    public const TABLE = "rl_provider";
+    public const TABLE = 'rl_provider';
+
     public const SELECT = [
         Provider::KEY_ID,
         Provider::KEY_SLUG,
@@ -28,7 +29,7 @@ class ProviderManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Provider::KEY_ID, "=", $id)
+            ->where(Provider::KEY_ID, '=', $id)
             ->first();
 
         if ($result === null) {
@@ -46,7 +47,7 @@ class ProviderManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Provider::KEY_SLUG, "=", $slug)
+            ->where(Provider::KEY_SLUG, '=', $slug)
             ->first();
 
         if ($result === null) {
@@ -86,7 +87,7 @@ class ProviderManager
      */
     public function getTotalAmount()
     {
-        return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
+        return DB::table(self::TABLE)->selectRaw('COUNT(*) as total')->first()->total ?? 0;
     }
 
     /**
@@ -183,7 +184,7 @@ class ProviderManager
         }
 
         DB::table(self::TABLE)
-            ->where(Provider::KEY_SLUG, "=", $slug)
+            ->where(Provider::KEY_SLUG, '=', $slug)
             ->update(
                 $this->buildUpdateArray(
                     $name,
@@ -197,7 +198,7 @@ class ProviderManager
     }
 
     /**
-     * @param string $name
+     * @param string|null $name
      * @param string|null $abbreviation
      * @param string|null $wikiURL
      * @param string|null $imageURL
@@ -205,7 +206,7 @@ class ProviderManager
      * @return array
      */
     public function buildUpdateArray(
-        string $name,
+        ?string $name,
         ?string $abbreviation,
         ?string $wikiURL,
         ?string $imageURL,

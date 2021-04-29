@@ -12,13 +12,14 @@ class Location extends AbstractModel
 
     public const KEY_ID = 'id';
     public const KEY_NAME = 'name';
-    public const KEY_SLUG = 'slug';
     public const KEY_COUNTRY_CODE = 'country_code';
     public const KEY_LATITUDE = 'latitude';
     public const KEY_LONGITUDE = 'longitude';
 
     use HasId;
-    use HasNameSlug;
+
+    /** @var string|null */
+    private ?string $name = null;
 
     /** @var string */
     private string $countryCode;
@@ -41,6 +42,25 @@ class Location extends AbstractModel
             self::KEY_LATITUDE => $this->latitude,
             self::KEY_LONGITUDE => $this->longitude
         ];
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string|null $name
+     * @return Status
+     */
+    public function setName(?string $name): self
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**
