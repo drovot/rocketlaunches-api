@@ -42,7 +42,7 @@ class PadManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Pad::KEY_ID, "=", $id)
+            ->where(Pad::KEY_ID, '=', $id)
             ->first();
 
         if ($result === null) {
@@ -60,7 +60,7 @@ class PadManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Pad::KEY_SLUG, "=", $slug)
+            ->where(Pad::KEY_SLUG, '=', $slug)
             ->first();
 
         if ($result === null) {
@@ -75,7 +75,7 @@ class PadManager
      */
     public function getTotalAmount()
     {
-        return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
+        return DB::table(self::TABLE)->selectRaw('COUNT(*) as total')->first()->total ?? 0;
     }
 
     /**
@@ -171,7 +171,7 @@ class PadManager
      */
     public function deletePad($slug): void
     {
-        DB::table(self::TABLE)->where(Pad::KEY_SLUG, "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Pad::KEY_SLUG, '=', $slug)->delete();
     }
 
     /**
@@ -196,7 +196,7 @@ class PadManager
         }
 
         DB::table(self::TABLE)
-            ->where(Pad::KEY_SLUG, "=", $pad->getSlug())
+            ->where(Pad::KEY_SLUG, '=', $pad->getSlug())
             ->update(
                 $this->buildUpdateArray(
                     $name,

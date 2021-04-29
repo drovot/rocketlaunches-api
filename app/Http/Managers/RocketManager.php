@@ -28,7 +28,7 @@ class RocketManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Rocket::KEY_ID, "=", $id)
+            ->where(Rocket::KEY_ID, '=', $id)
             ->first();
 
         if ($result === null) {
@@ -46,7 +46,7 @@ class RocketManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Rocket::KEY_SLUG, "=", $slug)
+            ->where(Rocket::KEY_SLUG, '=', $slug)
             ->first();
 
         if ($result === null) {
@@ -125,7 +125,7 @@ class RocketManager
             return false;
         }
 
-        DB::table(self::TABLE)->where(Rocket::KEY_NAME, "=", $slug)
+        DB::table(self::TABLE)->where(Rocket::KEY_NAME, '=', $slug)
             ->update($this->buildUpdateArray(
                 $name,
                 $imageURL,
@@ -145,7 +145,7 @@ class RocketManager
             return;
         }
 
-        DB::table(self::TABLE)->where(Rocket::KEY_SLUG, "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Rocket::KEY_SLUG, '=', $slug)->delete();
     }
 
     /**
@@ -153,7 +153,7 @@ class RocketManager
      */
     public function getTotalAmount()
     {
-        return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
+        return DB::table(self::TABLE)->selectRaw('COUNT(*) as total')->first()->total ?? 0;
     }
 
     /**

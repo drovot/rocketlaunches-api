@@ -21,7 +21,25 @@ class ReminderManager
     /** @var LaunchManager */
     private LaunchManager $launchManager;
 
-    private const REMINDER_TABLE = 'reminder';
+    /** @var UserManager */
+    private UserManager $userManager;
+
+    public const TABLE = 'reminder';
+    public const TABLE_X_SUBSCRIPTION = 'reminder_x_subscription';
+
+    private const KEY_USER_ID = 'user_id';
+    private const KEY_FOREIGN_ID = 'foreign_id';
+    private const KEY_FOREIGN_TYPE = 'foreign_type';
+
+    private const FOREIGN_TYPE_PROVIDER = 'provider';
+    private const FOREIGN_TYPE_ROCKET = 'rocket';
+
+    public const SELECT = [
+        Reminder::KEY_ID,
+        Reminder::KEY_TITLE,
+        Reminder::KEY_LAUNCH,
+        Reminder::KEY_USER_ID
+    ];
 
     /**
      * ReminderManager constructor.
@@ -29,28 +47,39 @@ class ReminderManager
     public function __construct()
     {
         $this->launchManager = new LaunchManager();
+        $this->userManager = new UserManager();
+    }
+
+    /**
+     * @param string $title
+     * @param Launch $launch
+     * @param User $user
+     * @return Reminder|null
+     */
+    private function createReminder(string $title, Launch $launch, User $user): ?Reminder
+    {
+        try {
+            $id = DB::table(self::TABLE)
+                ->insertGetId([
+                    Reminder::KEY_TITLE => $title,
+                    Reminder::KEY_LAUNCH => json_encode([$launch->getSlug()], JSON_THROW_ON_ERROR),
+                    Reminder::KEY_USER_ID => $user->getId()
+                ]);
+
+            return $this->getReminderById($id);
+        } catch (\JsonException $exception) {
+            return null;
+        }
     }
 
     /**
      * @param Reminder $reminder
-     * @return bool
+     * @return Reminder|null
      */
-    public function executeReminder(Reminder $reminder): bool
+    public function executeReminder(Reminder $reminder): ?Reminder
     {
         ReminderTemplateGenerator::generate($reminder);
-
-        try {
-            DB::table(self::REMINDER_TABLE)
-                ->insert([
-                    Reminder::KEY_TITLE => $reminder->getTitle(),
-                    Reminder::KEY_LAUNCH => json_encode([$reminder->getLaunch()->getSlug()], JSON_THROW_ON_ERROR),
-                    Reminder::KEY_USER_ID => $reminder->getUser()->getId()
-                ]);
-        } catch (\JsonException $exception) {
-            return false;
-        }
-
-        return true;
+        return $this->createReminder($reminder->getTitle(), $reminder->getLaunch(), $reminder->getUser());
     }
 
     /**
@@ -93,7 +122,7 @@ class ReminderManager
         $result = DB::table(LaunchManager::TABLE)
             ->select(LaunchManager::SELECT)
             ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, RocketManager::TABLE . "." . Provider::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_PROVIDER_ID)
             ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", LaunchManager::TABLE . "." . Launch::KEY_PAD_ID)
             ->whereDate(LaunchTime::KEY_LAUNCH_NET, Carbon::now()->format("Y-m-d"))
             ->where(Launch::KEY_PUBLISHED, "=", 1)
@@ -104,5 +133,80 @@ class ReminderManager
         }
 
         return $launches;
+    }
+
+    /**
+     * @param int $id
+     * @return Reminder|null
+     */
+    private function getReminderById(int $id): ?Reminder
+    {
+        $result = DB::table(self::TABLE)
+            ->select(self::SELECT)
+            ->where(Reminder::KEY_ID, '=', $id)
+            ->first();
+
+        if ($result === null) {
+            return null;
+        }
+
+        return $this->buildReminderFromDatabaseResult($result);
+    }
+
+    /**
+     * @param User $user
+     * @param Launch $launch
+     * @return bool
+     */
+    public function hasSubscribed(User $user, Launch $launch): bool
+    {
+        if ($user === null || ($launch->getProvider() === null && $launch->getRocket() === null)) {
+            return false;
+        }
+
+        $provider = DB::table(self::TABLE_X_SUBSCRIPTION)
+            ->where([
+                self::KEY_USER_ID => $user->getId(),
+                self::KEY_FOREIGN_ID => $launch->getProvider() === null ? null : $launch->getProvider()->getId(),
+                self::KEY_FOREIGN_TYPE => self::FOREIGN_TYPE_PROVIDER
+            ])
+            ->first();
+
+        $rocket = DB::table(self::TABLE_X_SUBSCRIPTION)
+            ->where([
+                self::KEY_USER_ID => $user->getId(),
+                self::KEY_FOREIGN_ID => $launch->getRocket() === null ? null : $launch->getRocket()->getId(),
+                self::KEY_FOREIGN_TYPE => self::FOREIGN_TYPE_ROCKET
+            ])
+            ->first();
+
+        return !($rocket === null && $provider === null);
+    }
+
+    /**
+     * @param $result
+     * @return Reminder
+     */
+    private function buildReminderFromDatabaseResult($result): Reminder
+    {
+        $reminder = new Reminder();
+
+        if (isset($result->id)) {
+            $reminder->setId($result->id);
+        }
+
+        if (isset($result->title)) {
+            $reminder->setTitle($result->id);
+        }
+
+        if (isset($result->launch)) {
+            $reminder->setLaunch($this->launchManager->getLaunchBySlug($result->launch));
+        }
+
+        if (isset($result->user_id)) {
+            $reminder->setUser($this->userManager->getUserById($result->user_id));
+        }
+
+        return $reminder;
     }
 }

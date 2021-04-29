@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class StatusManager
 {
-    public const TABLE = "launch_status";
+    public const TABLE = 'launch_status';
 
     public const SELECT = [
         self::TABLE . '.' . Status::KEY_ID,
@@ -25,7 +25,7 @@ class StatusManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Status::KEY_ID, "=", $id)
+            ->where(Status::KEY_ID, '=', $id)
             ->first();
 
         if ($result === null) {
@@ -43,7 +43,7 @@ class StatusManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Status::KEY_LAUNCH_ID, "=", $id)
+            ->where(Status::KEY_LAUNCH_ID, '=', $id)
             ->first();
 
         if ($result === null) {
@@ -61,7 +61,7 @@ class StatusManager
     {
         $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->where(Status::KEY_NAME, "=", $name)
+            ->where(Status::KEY_NAME, '=', $name)
             ->first();
 
         if ($result === null) {
@@ -116,7 +116,7 @@ class StatusManager
      */
     public function getTotalAmount()
     {
-        return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
+        return DB::table(self::TABLE)->selectRaw('COUNT(*) as total')->first()->total ?? 0;
     }
 
     /**

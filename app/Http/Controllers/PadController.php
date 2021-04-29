@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Managers\Defaults;
+use App\Http\Managers\LocationManager;
 use App\Http\Managers\PadManager;
 use App\Http\Managers\Utils;
 use App\Http\Response\Response;
+use App\Models\Location;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use Laravel\Lumen\Routing\Controller as BaseController;
@@ -91,6 +93,14 @@ class PadController extends BaseController
         $wikiURL = $request->has("wikiURL") ? $request->get("wikiURL") : null;
         $imageURL = $request->has("imageURL") ? $request->get("imageURL") : null;
 
+        $locationName = $request->has("locationName") ? $request->get("locationName") : null;
+        $locationCountryCode = $request->has("locationCountryCode") ? $request->get("locationCountryCode") : null;
+        $locationLatitude = $request->has("locationLatitude") ? $request->get("locationLatitude") : null;
+        $locationLongitude = $request->has("locationLongitude") ? $request->get("locationLongitude") : null;
+
+        $locationManager = new LocationManager();
+        $location = $locationManager->createLocation($locationName, $locationCountryCode, $locationLatitude, $locationLongitude);
+
         $trackingId = $request->attributes->has('tracking_id') ? $request->attributes->get('tracking_id') : null;
         $response->setTrackingId($trackingId);
 
@@ -98,6 +108,7 @@ class PadController extends BaseController
             $name,
             $wikiURL,
             $imageURL,
+            $location
         );
 
         if (!$success) {
@@ -130,6 +141,7 @@ class PadController extends BaseController
             $name,
             $wikiURL,
             $imageURL,
+            null
         );
 
         if (!$success) {

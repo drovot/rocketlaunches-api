@@ -16,23 +16,23 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use function PHPUnit\Framework\isEmpty;
 
-define('TABLE', env('DATABASE_TABLE_LAUNCH', 'launch'));
-
 class LaunchManager
 {
 
+    public const TABLE = 'rl_launch';
+
     public const SELECT = [
-        TABLE . ".id as id",
-        TABLE . ".name as name",
-        TABLE . ".slug as slug",
-        TABLE . ".description as description",
-        TABLE . ".tags as tags",
-        TABLE . ".livestream_url as livestream_url",
-        TABLE . ".start_win_open as start_win_open",
-        TABLE . ".start_win_close as start_win_close",
-        TABLE . ".start_net as start_net",
-        TABLE . ".published as published",
-        TABLE . ".status_id as status_id",
+        self::TABLE . ".id as id",
+        self::TABLE . ".name as name",
+        self::TABLE . ".slug as slug",
+        self::TABLE . ".description as description",
+        self::TABLE . ".tags as tags",
+        self::TABLE . ".livestream_url as livestream_url",
+        self::TABLE . ".start_win_open as start_win_open",
+        self::TABLE . ".start_win_close as start_win_close",
+        self::TABLE . ".start_net as start_net",
+        self::TABLE . ".published as published",
+        self::TABLE . ".status_id as status_id",
         RocketManager::TABLE . ".id as rocket_id",
         RocketManager::TABLE . ".name as rocket_name",
         RocketManager::TABLE . ".slug as rocket_slug",
@@ -85,12 +85,12 @@ class LaunchManager
      */
     public function getLaunchById($id): ?Launch
     {
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
-            ->where(TABLE . '.' . Launch::KEY_ID, "=", $id)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
+            ->where(self::TABLE . '.' . Launch::KEY_ID, "=", $id)
             ->first();
 
         if ($result === null) {
@@ -107,12 +107,12 @@ class LaunchManager
      */
     public function getLaunchBySlug(string $slug, bool $detailed = Defaults::REQUEST_DETAILED): ?Launch
     {
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
-            ->where(TABLE . '.' . Launch::KEY_SLUG, "=", $slug)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
+            ->where(self::TABLE . '.' . Launch::KEY_ID, "=", $id)
             ->first();
 
         if ($result === null) {
@@ -138,11 +138,11 @@ class LaunchManager
         }
 
         $currentTime = Carbon::now()->toDateTimeString();
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . '.' . Rocket::KEY_ID, '=', TABLE . '.' . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . '.' . Provider::KEY_ID, '=', TABLE . '.' . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . '.' . Pad::KEY_ID, '=', TABLE . '.' . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . '.' . Rocket::KEY_ID, '=', self::TABLE . '.' . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . '.' . Provider::KEY_ID, '=', self::TABLE . '.' . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . '.' . Pad::KEY_ID, '=', self::TABLE . '.' . Launch::KEY_PAD_ID)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->orderBy($orderBy, $orderMethod)
@@ -165,11 +165,11 @@ class LaunchManager
             $limit = Defaults::REQUEST_LIMIT_MAX;
         }
 
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->where(Launch::KEY_PUBLISHED, "=", 0)
@@ -190,11 +190,11 @@ class LaunchManager
             $limit = Defaults::REQUEST_LIMIT_MAX;
         }
 
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
             ->offset(($page - 1) * $limit)
             ->orderBy("published", "DESC")
             ->limit($limit)
@@ -212,11 +212,11 @@ class LaunchManager
      */
     public function getLaunchesByProvider(Provider $provider, int $limit, int $page, bool $detailed): array
     {
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->where(Launch::KEY_PROVIDER_ID, "=", $provider->getId())
@@ -235,11 +235,11 @@ class LaunchManager
      */
     public function getLaunchesByRocket(Rocket $rocket, int $limit, int $page, bool $detailed): array
     {
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
             ->offset(($page - 1) * $limit)
             ->limit($limit)
             ->where(Launch::KEY_ROCKET_ID, "=", $rocket->getId())
@@ -258,11 +258,11 @@ class LaunchManager
      */
     public function getLaunchesByPad(Pad $pad, int $limit, int $page, bool $detailed): array
     {
-        $result = DB::table(TABLE)
+        $result = DB::table(self::TABLE)
             ->select(self::SELECT)
-            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", TABLE . "." . Launch::KEY_ROCKET_ID)
-            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", TABLE . "." . Launch::KEY_PROVIDER_ID)
-            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", TABLE . "." . Launch::KEY_PAD_ID)
+            ->join(RocketManager::TABLE, RocketManager::TABLE . "." . Rocket::KEY_ID, "=", self::TABLE . "." . Launch::KEY_ROCKET_ID)
+            ->join(ProviderManager::TABLE, ProviderManager::TABLE . "." . Provider::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PROVIDER_ID)
+            ->join(PadManager::TABLE, PadManager::TABLE . "." . Pad::KEY_ID, "=", self::TABLE . "." . Launch::KEY_PAD_ID)
             ->where(Launch::KEY_PAD_ID, "=", $pad->getId())
             ->where(Launch::KEY_PUBLISHED, "=", 1)
             ->offset(($page - 1) * $limit)
@@ -277,7 +277,7 @@ class LaunchManager
      */
     public function deleteLaunch($slug): void
     {
-        DB::table(TABLE)->where(Launch::KEY_SLUG, "=", $slug)->delete();
+        DB::table(self::TABLE)->where(Launch::KEY_SLUG, "=", $slug)->delete();
     }
 
     /**
@@ -288,19 +288,19 @@ class LaunchManager
     {
         switch ($key) {
             case self::KEY_TOTAL_UNPUBLISHED:
-                return DB::table(TABLE)->selectRaw("COUNT(*) as total")
+                return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")
                         ->where(Launch::KEY_PUBLISHED, "=", 0)->first()->total ?? 0;
             case self::KEY_TOTAL_UPCOMING:
-                return DB::table(TABLE)->selectRaw("COUNT(*) as total")->where(Launch::KEY_PUBLISHED, "=", 1)
+                return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->where(Launch::KEY_PUBLISHED, "=", 1)
                         ->where(Defaults::DATABASE_COLUMN_START_NET, '>', Carbon::now()->toDateTimeString())->first()->total ?? 0;
             case self::KEY_TOTAL_PREVIOUS:
-                return DB::table(TABLE)->selectRaw("COUNT(*) as total")->where(Launch::KEY_PUBLISHED, "=", 1)
+                return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->where(Launch::KEY_PUBLISHED, "=", 1)
                         ->where(Defaults::DATABASE_COLUMN_START_NET, '<', Carbon::now()->toDateTimeString())->first()->total ?? 0;
             case self::KEY_TOTAL_ALL:
-                return DB::table(TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
+                return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")->first()->total ?? 0;
             case self::KEY_TOTAL_DEFAULT:
             default:
-                return DB::table(TABLE)->selectRaw("COUNT(*) as total")
+                return DB::table(self::TABLE)->selectRaw("COUNT(*) as total")
                         ->where(Launch::KEY_PUBLISHED, "=", 1)->first()->total ?? 0;
         }
     }
@@ -481,7 +481,7 @@ class LaunchManager
      * @param Rocket|null $rocket
      * @param Pad|null $pad
      * @param Provider|null $provider
-     * @param Status|null $launchStatus
+     * @param Status|null $status
      * @param LaunchTime|null $launchTime
      * @param array $tags
      * @param string|null $livestreamURL
@@ -505,7 +505,7 @@ class LaunchManager
             return false;
         }
 
-        DB::table(TABLE)->insert([
+        DB::table(self::TABLE)->insert([
             Launch::KEY_NAME => $name,
             Launch::KEY_SLUG => Utils::stringToSlug($name),
             Launch::KEY_DESCRIPTION => $description,
@@ -558,7 +558,7 @@ class LaunchManager
             return false;
         }
 
-        DB::table(TABLE)
+        DB::table(self::TABLE)
             ->where(Launch::KEY_SLUG, "=", $originalSlug)
             ->update(
                 $this->buildUpdateArray(
